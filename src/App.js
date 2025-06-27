@@ -1,23 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import Todo from "./components/Todo/Todo";
 import TodoForm from "./components/TodoForm/TodoForm";
+import useFetchApi from "./useFetchApi";
 
 function App() {
-  const [todos, setTodos] = useState([
-    {
-      text: "Learn about React",
-      isCompleted: false
-    },
-    {
-      text: "Meet friend for lunch",
-      isCompleted: false
-    },
-    {
-      text: "Build really cool todo app",
-      isCompleted: false
-    }
-  ]);
+  const { data: todos, loading, error, setData: setTodos } = useFetchApi("https://jsonplaceholder.typicode.com/todos?_limit=10");
 
   const addTodo = text => {
     setTodos((previousTodos) => [...previousTodos, { text }]);
@@ -34,15 +22,21 @@ function App() {
   return (
     <div className="app">
       <div className="todo-list">
-        {todos.map((todo, index) => (
-          <Todo
-            key={index}
-            index={index}
-            todo={todo}
-            completeTodo={completeTodo}
-            removeTodo={removeTodo}
-          />
-        ))}
+        {loading ? (
+          <div>Loading...</div>
+        ) : error ? (
+          <div>Error loading todos.</div>
+        ) : (
+          todos.map((todo, index) => (
+            <Todo
+              key={index}
+              index={index}
+              todo={todo}
+              completeTodo={completeTodo}
+              removeTodo={removeTodo}
+            />
+          ))
+        )}
         <TodoForm addTodo={addTodo} />
       </div>
     </div>
